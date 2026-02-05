@@ -1,0 +1,18 @@
+# BigQuery Configuration
+# This file contains project, dataset, and table configurations
+
+project:
+  id: "your-project-id"
+  region: "us-central1"
+
+dataset:
+  name: "trading_analytics"
+  location: "US"
+
+tables:
+  metrics_daily: "metrics_daily"
+  finance_gold: "finance_gold"
+  tech_logs: "tech_logs"
+  trading_metrics: "trading_metrics"
+  metrics_monthly: "metrics_monthly"
+
