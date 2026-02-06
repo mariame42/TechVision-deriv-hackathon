@@ -59,3 +59,6 @@ venv/
 env/
 ENV/
 .venv
+
+#bin
+bin/
