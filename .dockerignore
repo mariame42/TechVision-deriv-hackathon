@@ -1,0 +1,65 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+dist/
+build/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files (will be passed via docker-compose)
+.env
+.env.local
+
+# Documentation (not needed in container)
+*.md
+!README.md
+
+# Tests (not needed in production container)
+tests/
+pytest.ini
+.pytest_cache/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Credentials (will be mounted as volume)
+google_credentials.json
+*.json
+!config/bigquery_config.yaml
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Bin directory
+bin/
+

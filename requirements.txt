@@ -13,6 +13,10 @@ langchain-google-vertexai>=1.0.0
 # HTTP requests for external APIs
 requests>=2.31.0
 
+# API Server (FastAPI)
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
 # Configuration management
 python-dotenv>=1.0.0
 pyyaml>=6.0

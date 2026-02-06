@@ -40,6 +40,8 @@ ENV/
 # BigQuery credentials
 *.json
 !config/bigquery_config.yaml
+google_credentials.json
+service-account-key.json
 
 # Logs
 *.log

@@ -1,0 +1,70 @@
+services:
+  # Backend Service - LangGraph Trading Analytics API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: trading-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # CRITICAL: Mount Google Cloud credentials for BigQuery access
+      # Make sure google_credentials.json exists in project root
+      - ./google_credentials.json:/app/google_credentials.json:ro
+      # Optional: Mount config for easy updates without rebuild
+      - ./config:/app/config:ro
+    environment:
+      # Google Cloud credentials path (inside container)
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/google_credentials.json
+      # Feature flags - set to false to use real BigQuery
+      - USE_MOCK_INTERNAL=${USE_MOCK_INTERNAL:-true}
+      - USE_MOCK_EXTERNAL=${USE_MOCK_EXTERNAL:-true}
+      # BigQuery configuration
+      - BIGQUERY_PROJECT=${BIGQUERY_PROJECT:-}
+      - BIGQUERY_DATASET=${BIGQUERY_DATASET:-}
+      # External API keys
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY:-}
+      - BLOOMBERG_API_KEY=${BLOOMBERG_API_KEY:-}
+      # LLM configuration
+      - LLM_MODEL=${LLM_MODEL:-gemini-pro}
+      - LLM_PROVIDER=${LLM_PROVIDER:-vertex-ai}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      # Python environment
+      - PYTHONUNBUFFERED=1
+    networks:
+      - trading-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+  # Frontend Service - React Trading Analytics UI
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: trading-frontend
+    ports:
+      - "3000:80"
+    environment:
+      # Vite environment variable for backend URL
+      # For Docker internal networking, use service name
+      # For browser access, use localhost (browser makes requests)
+      - VITE_BACKEND_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - trading-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  trading-network:
+    driver: bridge

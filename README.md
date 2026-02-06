@@ -22,26 +22,46 @@ See [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) for detailed documentation.
 
 ## Quick Start
 
-### 1. Install Dependencies
+### Option A: Docker (Recommended for Hackathon/Demo)
 
-```bash
-pip install -r requirements.txt
-```
+**Fastest way to get started with a production-like setup:**
 
-### 2. Configure Environment
+1. **Get Google Cloud Credentials:**
+   - Download your service account JSON key from Google Cloud Console
+   - Place it in project root as `google_credentials.json`
 
-Copy the example environment file and configure it:
+2. **Run with Docker:**
+   ```bash
+   docker-compose up --build
+   ```
 
-```bash
-cp config/.env.example config/.env
-# Edit config/.env with your settings
-```
+3. **Access the API:**
+   - API: http://localhost:8000
+   - Health check: http://localhost:8000/health
 
-### 3. Run the Application
+See [DOCKER_SETUP.md](./DOCKER_SETUP.md) for detailed Docker instructions.
 
-```bash
-python main.py
-```
+### Option B: Local Development
+
+1. **Install Dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Configure Environment:**
+   ```bash
+   cp config/.env.example .env
+   # Edit .env with your settings
+   ```
+
+3. **Run the Application:**
+   ```bash
+   # Test script
+   python main.py
+   
+   # Or start API server
+   python -m uvicorn api_server:app --reload
+   ```
 
 ## Development Mode
 
@@ -73,6 +93,18 @@ pytest tests/
 - **Tools**: `src/tools/` - Internal SQL and External API tools
 - **Nodes**: `src/nodes/` - Workflow processing nodes
 - **Graph**: `src/graph/workflow.py` - LangGraph workflow construction
+- **API Server**: `api_server.py` - FastAPI REST API wrapper
+
+## Docker Support
+
+This project is fully dockerized for easy deployment:
+
+- **Dockerfile**: Production-ready container with Python 3.10
+- **docker-compose.yml**: Orchestrates backend (and future frontend) services
+- **BigQuery Integration**: Credentials mounted securely as read-only volume
+- **Health Checks**: Built-in health monitoring for container orchestration
+
+See [DOCKER_SETUP.md](./DOCKER_SETUP.md) for complete Docker documentation.
 
 ## Next Steps
 
