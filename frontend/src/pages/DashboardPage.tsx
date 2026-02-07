@@ -18,6 +18,7 @@ import {
   ClockIcon,
   ArrowPathIcon,
   UserMinusIcon,
+  ArrowPathIcon as RefreshIcon,
 } from '@heroicons/react/24/outline';
 
 interface DashboardMetrics {
@@ -40,13 +41,25 @@ const DashboardPage: React.FC = () => {
     analysis: 'Loading insights...',
     sentiment: 'neutral',
   });
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Load data on mount
   useEffect(() => {
     loadDashboardData();
   }, []);
 
+  // Auto-refresh every 30 seconds (for real-time updates)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadDashboardData();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
+
   const loadDashboardData = async () => {
     try {
+      setIsRefreshing(true);
       const data = await fetchDashboardData();
       
       if (data.cards) {
@@ -78,6 +91,8 @@ const DashboardPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading dashboard:', error);
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -137,7 +152,24 @@ const DashboardPage: React.FC = () => {
     <div className="space-y-6">
       {/* Section A: Domain Health Overview */}
       <section>
-        <h2 className="text-xl font-semibold text-white mb-4">Domain Health Overview</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-white">Domain Health Overview</h2>
+          <button
+            onClick={loadDashboardData}
+            disabled={isRefreshing}
+            className={`
+              flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors
+              ${isRefreshing
+                ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-700 hover:bg-gray-600 text-white'
+              }
+            `}
+            title="Refresh dashboard data"
+          >
+            <RefreshIcon className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="text-sm">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+          </button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {metricConfigs.map((config) => {
             const value = metrics[config.key as keyof DashboardMetrics];

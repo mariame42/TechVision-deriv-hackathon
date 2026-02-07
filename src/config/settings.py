@@ -28,9 +28,11 @@ class Settings:
     bloomberg_api_key: Optional[str] = None
     
     # LLM settings
-    llm_model: str = "gemini-pro"
-    llm_provider: str = "vertex-ai"  # or "openai", etc.
+    llm_model: str = "openai/gpt-3.5-turbo"  # Default for OpenRouter (use format: provider/model)
+    llm_provider: str = "openrouter"  # or "vertex-ai", "openai", etc.
     llm_api_key: Optional[str] = None
+    openrouter_api_key: Optional[str] = None
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
     
     @classmethod
     def from_env(cls) -> "Settings":
@@ -48,9 +50,11 @@ class Settings:
             bigquery_credentials_path=os.getenv("BIGQUERY_CREDENTIALS_PATH"),
             coingecko_api_key=os.getenv("COINGECKO_API_KEY"),
             bloomberg_api_key=os.getenv("BLOOMBERG_API_KEY"),
-            llm_model=os.getenv("LLM_MODEL", "gemini-pro"),
-            llm_provider=os.getenv("LLM_PROVIDER", "vertex-ai"),
+            llm_model=os.getenv("LLM_MODEL", "openai/gpt-3.5-turbo"),
+            llm_provider=os.getenv("LLM_PROVIDER", "openrouter"),
             llm_api_key=os.getenv("LLM_API_KEY"),
+            openrouter_api_key=os.getenv("OPENROUTER_API_KEY"),
+            openrouter_base_url=os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
         )
 
 

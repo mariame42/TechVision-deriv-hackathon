@@ -26,9 +26,12 @@ services:
       - COINGECKO_API_KEY=${COINGECKO_API_KEY:-}
       - BLOOMBERG_API_KEY=${BLOOMBERG_API_KEY:-}
       # LLM configuration
-      - LLM_MODEL=${LLM_MODEL:-gemini-pro}
-      - LLM_PROVIDER=${LLM_PROVIDER:-vertex-ai}
+      - LLM_MODEL=${LLM_MODEL:-openai/gpt-3.5-turbo}
+      - LLM_PROVIDER=${LLM_PROVIDER:-openrouter}
       - LLM_API_KEY=${LLM_API_KEY:-}
+      # OpenRouter configuration (for LLM classification)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
       # Python environment
       - PYTHONUNBUFFERED=1
     networks:
@@ -59,7 +62,7 @@ services:
       - trading-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health" ]
       interval: 30s
       timeout: 10s
       retries: 3
