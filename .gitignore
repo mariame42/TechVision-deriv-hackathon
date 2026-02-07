@@ -64,3 +64,6 @@ ENV/
 
 #bin
 bin/
+
+# Documentation archive (troubleshooting/debug docs)
+docs/archive/

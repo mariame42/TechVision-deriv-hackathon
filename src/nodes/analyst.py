@@ -11,80 +11,66 @@ from ..state import AgentState
 
 def node_analyst(state: AgentState) -> AgentState:
     """
-    Generates the Narrative using Raw + Derived Data.
+    Extracts the calculated number from derived_data and returns it.
     
-    The LLM sees both fetched_data and derived_data to generate
-    a comprehensive business insight.
+    For now, returns only the numeric result from the insights pipeline.
     
     Args:
         state: The current agent state
         
     Returns:
-        Updated state with final_response containing the insight
+        Updated state with final_response containing just the number
     """
-    print(f"--- ANALYST: Generating Insight for #{state.get('mapped_insight_id')} ---")
+    print(f"--- ANALYST: Extracting result for Insight #{state.get('mapped_insight_id')} ---")
     
-    # The LLM now sees the Math results too!
-    fetched_data = state.get("fetched_data", {})
     derived_data = state.get("derived_data", {})
-    data_context = {**fetched_data, **derived_data}
     
-    # TODO: Replace with actual LLM call (Gemini/Vertex AI)
-    # For now, using simulated response
-    # In production, this would use LangChain PromptTemplate + LLM
+    # Extract the first numeric value from derived_data
+    result_value = None
     
-    # SIMULATED LLM RESPONSE
-    narrative = _generate_simulated_insight(
-        user_query=state.get("user_query", ""),
-        insight_id=state.get("mapped_insight_id"),
-        insight_name=state.get("insight_name", ""),
-        data_context=data_context
-    )
-    
-    return {"final_response": narrative}
-
-
-def _generate_simulated_insight(
-    user_query: str,
-    insight_id: int,
-    insight_name: str,
-    data_context: dict
-) -> dict:
-    """
-    Generate a simulated insight (temporary until LLM is integrated).
-    
-    Args:
-        user_query: The user's original question
-        insight_id: The mapped insight ID
-        insight_name: The insight name
-        data_context: Combined fetched and derived data
+    if derived_data:
+        print(f"   [Analyst] derived_data keys: {list(derived_data.keys())}")
+        print(f"   [Analyst] derived_data values: {list(derived_data.values())}")
         
-    Returns:
-        Dictionary with headline, analysis, action_item, sentiment
-    """
-    # Example logic based on data
-    revenue = data_context.get("internal_revenue", 0)
-    volatility_ratio = data_context.get("volatility_ratio", 0)
-    btc_price = data_context.get("external_btc_price", 0)
-    
-    if volatility_ratio > 1.5:
-        headline = "Revenue Stable Relative to Market Volatility"
-        analysis = f"While revenue is at ${revenue:,.0f}, the Market/Internal Volatility Ratio is {volatility_ratio} (High). This indicates we are shielding users from broader market chaos."
-        sentiment = "positive"
-    elif revenue < 1000000:
-        headline = "Revenue Dip Driven by External Crypto Correction"
-        analysis = f"Internal revenue dropped to ${revenue:,.0f}, closely mirroring market conditions (BTC: ${btc_price:,.0f}). System latency remains stable, ruling out platform infrastructure issues."
-        sentiment = "neutral"
+        # Get the first value from derived_data
+        first_key = list(derived_data.keys())[0] if derived_data else None
+        if first_key:
+            result_value = derived_data[first_key]
+            print(f"   [Analyst] First key: {first_key}, value: {result_value}, type: {type(result_value).__name__}")
+            
+            # If it's a dict (like revenue_drop_root_cause), get the first numeric value
+            if isinstance(result_value, dict):
+                for key, value in result_value.items():
+                    if isinstance(value, (int, float)) and not (isinstance(value, float) and (value != value or value == float('inf'))):  # Check for NaN/inf
+                        result_value = float(value)  # Convert numpy types to Python float
+                        print(f"   [Analyst] Extracted from dict: {key} = {result_value}")
+                        break
+            # If it's already a number, use it directly
+            elif isinstance(result_value, (int, float)):
+                # Handle numpy types
+                if hasattr(result_value, 'item'):
+                    result_value = result_value.item()  # Convert numpy scalar to Python type
+                result_value = float(result_value)  # Ensure it's a Python float
+                print(f"   [Analyst] Using numeric value: {result_value}")
+            else:
+                result_value = None
+                print(f"   [Analyst] Value is not numeric: {type(result_value)}")
     else:
-        headline = "Revenue Performance Analysis"
-        analysis = f"Revenue stands at ${revenue:,.0f} with market volatility ratio of {volatility_ratio}. System is performing within expected parameters."
-        sentiment = "neutral"
+        print(f"   [Analyst] WARNING: derived_data is empty!")
     
+    print(f"   [Analyst] Extracted result value: {result_value}")
+    
+    # Return simple response with just the number
     return {
-        "headline": headline,
-        "analysis": analysis,
-        "action_item": "Monitor market conditions and continue tracking key metrics.",
-        "sentiment": sentiment,
-        "data": data_context  # Include raw data for frontend visualization
+        "final_response": {
+            "value": result_value if result_value is not None else 0,
+            "headline": "",
+            "analysis": "",
+            "action_item": "",
+            "sentiment": "neutral",
+            "data": derived_data  # Keep data for debugging
+        }
     }
+
+
 

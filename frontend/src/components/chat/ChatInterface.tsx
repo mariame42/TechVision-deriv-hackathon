@@ -37,13 +37,22 @@ const ChatInterface: React.FC = () => {
       let replyText = '';
 
       if (response.success && response.data) {
-        // Format the response nicely
-        const { headline, analysis, action_item } = response.data;
-        replyText = headline 
-          ? `${headline}\n\n${analysis || ''}${action_item ? `\n\n💡 ${action_item}` : ''}`
-          : analysis || 'I received your query, but could not generate a response.';
+        // Display the calculated value if available
+        const { value, headline, analysis, action_item } = response.data;
+        
+        if (value !== undefined && value !== null) {
+          // Display just the number for now
+          replyText = `${value}`;
+        } else if (headline) {
+          // Fallback to headline/analysis if value not available
+          replyText = headline 
+            ? `${headline}\n\n${analysis || ''}${action_item ? `\n\n💡 ${action_item}` : ''}`
+            : analysis || 'I received your query, but could not generate a response.';
+        } else {
+          replyText = analysis || 'I received your query, but could not generate a response.';
+        }
       } else {
-        replyText = response.data?.analysis || 'Sorry, I could not process your query.';
+        replyText = response.data?.value?.toString() || response.data?.analysis || 'Sorry, I could not process your query.';
       }
 
       const copilotMessage: ChatMessage = {

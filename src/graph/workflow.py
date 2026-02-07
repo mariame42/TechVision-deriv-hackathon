@@ -11,8 +11,7 @@ from ..nodes import (
     node_dispatcher,
     node_batch_loader,
     node_classifier,
-    node_hybrid_fetcher,
-    node_math_engine,
+    node_insights_pipeline,
     node_analyst,
 )
 
@@ -34,8 +33,7 @@ def create_app() -> StateGraph:
     workflow.add_node("dispatcher", node_dispatcher)
     workflow.add_node("batch_loader", node_batch_loader)
     workflow.add_node("classifier", node_classifier)
-    workflow.add_node("fetcher", node_hybrid_fetcher)
-    workflow.add_node("math_engine", node_math_engine)
+    workflow.add_node("insights_pipeline", node_insights_pipeline)
     workflow.add_node("analyst", node_analyst)
     
     # Set Entry Point
@@ -55,10 +53,9 @@ def create_app() -> StateGraph:
         }
     )
     
-    # Chat Flow: classifier -> fetcher -> math_engine -> analyst -> END
-    workflow.add_edge("classifier", "fetcher")
-    workflow.add_edge("fetcher", "math_engine")
-    workflow.add_edge("math_engine", "analyst")
+    # Chat Flow: classifier -> insights_pipeline -> analyst -> END
+    workflow.add_edge("classifier", "insights_pipeline")
+    workflow.add_edge("insights_pipeline", "analyst")
     workflow.add_edge("analyst", END)
     
     # Dashboard Flow: batch_loader -> END

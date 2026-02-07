@@ -14,7 +14,7 @@ This platform differentiates between two primary workflows:
 - **Orchestration**: LangGraph
 - **Tools**: LangChain
 - **Language**: Python 3.10+
-- **Data Source**: BigQuery (Mocked for development) & External Market APIs
+- **Data Source**: PostgreSQL (primary), BigQuery (legacy/mock), External Market APIs (legacy)
 
 ## Project Structure
 
@@ -39,7 +39,7 @@ See [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) for detailed documentation.
    - API: http://localhost:8000
    - Health check: http://localhost:8000/health
 
-See [DOCKER_SETUP.md](./DOCKER_SETUP.md) for detailed Docker instructions.
+**Note:** Docker uses host network mode to connect to PostgreSQL on the host machine. Ensure PostgreSQL is running and accessible on `localhost:5432`.
 
 ### Option B: Local Development
 
@@ -100,11 +100,14 @@ pytest tests/
 This project is fully dockerized for easy deployment:
 
 - **Dockerfile**: Production-ready container with Python 3.10
-- **docker-compose.yml**: Orchestrates backend (and future frontend) services
-- **BigQuery Integration**: Credentials mounted securely as read-only volume
+- **docker-compose.yml**: Orchestrates backend and frontend services
+- **PostgreSQL Integration**: Connects to PostgreSQL on host machine via host network mode
 - **Health Checks**: Built-in health monitoring for container orchestration
 
-See [DOCKER_SETUP.md](./DOCKER_SETUP.md) for complete Docker documentation.
+**Configuration:**
+- Backend uses `network_mode: host` to access PostgreSQL on `localhost:5432`
+- Frontend runs on port 3000 (mapped from container port 80)
+- Environment variables are read from `.env` file
 
 ## Next Steps
 

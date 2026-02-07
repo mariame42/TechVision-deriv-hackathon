@@ -1,195 +1,82 @@
 """
 Insight ID mappings (1-18).
 
-This module maps Insight IDs to their names, required metrics, and formulas.
+This module maps Insight IDs to their names.
 Used by:
-- Classifier node: to determine which metrics to fetch
-- Math engine: to calculate derived metrics based on insight-specific formulas
+- Classifier node: to get insight names for classification and display
 """
 
-from typing import Dict, List, Callable, Any
+from typing import Dict
 
-# Map of Insight ID to insight information
-INSIGHT_MAP: Dict[int, Dict[str, any]] = {
+# we have 18 insights, those 7 are the ones that
+# we can implement for having the currunt data bases
+# the first 6 will calclate numbers and resones
+# the last one will be just reasoning and not calclating numbers
+
+# 1.Trading Revenue Change
+# 2.Revenue Sensitivity to Volatility
+# 3.Active Trader Change
+# 4.Volatility Regime Shift
+# 5.Volume Contraction
+# 6.Asset Rotation Detection
+# 7.Revenue Drop Root Cause Chain
+
+# Map of Insight ID to insight name
+INSIGHT_MAP: Dict[int, Dict[str, str]] = {
     1: {
-        "Trading revenue change": {
-            "required_metrics": ["internal_revenue", "internal_revenue_previous"],
-            "formulas": {
-                "revenue_change": lambda data: (
-                    (data.get("internal_revenue", 0) - data.get("internal_revenue_previous", 0)) 
-                    / data.get("internal_revenue_previous", 1) * 100 
-                    if data.get("internal_revenue_previous", 0) > 0 else 0
-                ),
-                "revenue_change_absolute": lambda data: (
-                    data.get("internal_revenue", 0) - data.get("internal_revenue_previous", 0)
-                ),
-            }
-        },
+        "Trading revenue change": {}
     },
     2: {
-        "Revenue per segment": {
-            "required_metrics": ["internal_revenue"],
-        },
+        "Revenue per segment": {}
     },
     3: {
-        "Revenue sensitivity to volatility": {
-            "required_metrics": ["internal_revenue", "internal_volatility", "external_market_volatility"],
-            "formulas": {
-                "volatility_ratio": lambda data: (
-                    data.get("external_market_volatility", 0) / data.get("internal_volatility", 1)
-                    if data.get("internal_volatility", 0) > 0 else 0
-                ),
-                "revenue_volatility_correlation": lambda data: (
-                    "positive" if data.get("internal_revenue", 0) > 0 and data.get("internal_volatility", 0) > 0 
-                    else "negative" if data.get("internal_revenue", 0) < 0 else "neutral"
-                ),
-            }
-        },
+        "Revenue sensitivity to volatility": {}
     },
     4: {
-        "Active trader change": {
-            "required_metrics": ["internal_active_traders", "internal_active_traders_previous"],
-            "formulas": {
-                "trader_change_percentage": lambda data: (
-                    (data.get("internal_active_traders", 0) - data.get("internal_active_traders_previous", 0))
-                    / data.get("internal_active_traders_previous", 1) * 100
-                    if data.get("internal_active_traders_previous", 0) > 0 else 0
-                ),
-                "trader_change_absolute": lambda data: (
-                    data.get("internal_active_traders", 0) - data.get("internal_active_traders_previous", 0)
-                ),
-            }
-        },
+        "Active trader change": {}
     },
     5: {
-        "VIP migration": {
-            "required_metrics": ["internal_vip_migration"],
-        },
+        "VIP migration": {}
     },
     6: {
-        "Deposit / withdrawal anomaly": {
-            "required_metrics": ["internal_deposit_withdrawal_anomaly"],
-        },
+        "Deposit / withdrawal anomaly": {}
     },
     7: {
-        "Volatility regime shift": {
-            "required_metrics": ["internal_volatility", "internal_volatility_historical_avg", "external_market_volatility"],
-            "formulas": {
-                "volatility_regime_shift": lambda data: (
-                    "high" if data.get("internal_volatility", 0) > data.get("internal_volatility_historical_avg", 0) * 1.5
-                    else "low" if data.get("internal_volatility", 0) < data.get("internal_volatility_historical_avg", 0) * 0.5
-                    else "normal"
-                ),
-                "volatility_deviation": lambda data: (
-                    (data.get("internal_volatility", 0) - data.get("internal_volatility_historical_avg", 0))
-                    / data.get("internal_volatility_historical_avg", 1) * 100
-                    if data.get("internal_volatility_historical_avg", 0) > 0 else 0
-                ),
-            }
-        },
+        "Volatility regime shift": {}
     },
     8: {
-        "Volume contraction": {
-            "required_metrics": ["internal_volume_contraction"],
-        },
+        "Volume contraction": {}
     },
     9: {
-        "Asset rotation detection": {
-            "required_metrics": ["internal_asset_rotation_detection"],
-        },
+        "Asset rotation detection": {}
     },
     10: {
-        "Exposure concentration": {
-            "required_metrics": ["internal_exposure_concentration"],
-        },
+        "Exposure concentration": {}
     },
     11: {
-        "Leverage spike": {
-            "required_metrics": ["internal_leverage_spike"],
-        },
+        "Leverage spike": {}
     },
     12: {
-        "Margin call acceleration": {
-            "required_metrics": ["internal_margin_call_acceleration"],
-        },
+        "Margin call acceleration": {}
     },
     13: {
-        "Latency impact": {
-            "required_metrics": ["internal_latency"],
-        },
+        "Latency impact": {}
     },
     14: {
-        "Order rejection spike": {
-            "required_metrics": ["internal_order_rejection_spike"],
-        },
+        "Order rejection spike": {}
     },
     15: {
-        "Fee change impact": {
-            "required_metrics": ["internal_fee_change_impact"],
-        },
+        "Fee change impact": {}
     },
     16: {
-        "Market share shift": {
-            "required_metrics": ["internal_market_share_shift"],
-        },
+        "Market share shift": {}
     },
     17: {
-        "Revenue drop root cause chain": {
-            "required_metrics": [
-                "internal_revenue",
-                "internal_revenue_previous",
-                "internal_latency",
-                "internal_volatility",
-                "external_btc_price",
-                "external_market_volatility",
-            ],
-            "formulas": {
-                "revenue_drop_percentage": lambda data: (
-                    (data.get("internal_revenue", 0) - data.get("internal_revenue_previous", 0))
-                    / data.get("internal_revenue_previous", 1) * 100
-                    if data.get("internal_revenue_previous", 0) > 0 else 0
-                ),
-                "volatility_ratio": lambda data: (
-                    data.get("external_market_volatility", 0) / data.get("internal_volatility", 1)
-                    if data.get("internal_volatility", 0) > 0 else 0
-                ),
-                "latency_impact_score": lambda data: (
-                    data.get("internal_latency", 0) * 0.1  # Simple scoring: higher latency = higher impact
-                ),
-            }
-        },
+        "Revenue drop root cause chain": {}
     },
     18: {
-        "Risk surge root cause chain": {
-            "required_metrics": ["internal_risk_surge_root_cause_chain"],
-        },
+        "Risk surge root cause chain": {}
     },
-    # 1: {
-    #     "name": "General Trend Analysis",
-    #     "required_metrics": ["internal_revenue", "internal_arpu"],
-    # },
-
-    # 2: {
-    
-    # 17: {
-    #     "name": "Revenue Drop Root Cause",
-    #     "required_metrics": [
-    #         "internal_revenue",
-    #         "internal_latency",
-    #         "internal_volatility",
-    #         "external_btc_price",
-    #         "external_market_volatility",
-    #     ],
-    # },
-    
-    # TODO: Add remaining insights (2-16, 18)
-    # Example structure:
-    # 2: {
-    #     "name": "VIP Retention Analysis",
-    #     "required_metrics": ["internal_vip_retention", "internal_churn"],
-    # },
-
-
 }
 
 # Revenue

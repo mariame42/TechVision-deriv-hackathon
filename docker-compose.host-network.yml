@@ -1,3 +1,7 @@
+# Alternative docker-compose config using host network mode
+# This bypasses Docker networking entirely and uses host network
+# Use this if PostgreSQL connection still fails with bridge network
+
 services:
   # Backend Service - LangGraph Trading Analytics API
   backend:
@@ -5,10 +9,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: trading-backend
-    network_mode: host  # Use host network - allows access to host's localhost (127.0.0.1)
+    network_mode: host # Use host network - simpler for localhost connections
     volumes:
       # CRITICAL: Mount Google Cloud credentials for BigQuery access
-      # Make sure google_credentials.json exists in project root
       - ./google_credentials.json:/app/google_credentials.json:ro
       # Optional: Mount config for easy updates without rebuild
       - ./config:/app/config:ro
@@ -31,8 +34,7 @@ services:
       # OpenRouter configuration (for LLM classification)
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
-      # PostgreSQL configuration
-      # Use localhost with host network mode (PostgreSQL listens on 127.0.0.1)
+      # PostgreSQL configuration - use localhost with host network
       - POSTGRES_HOST=${POSTGRES_HOST:-localhost}
       - POSTGRES_DATABASE=${POSTGRES_DATABASE:-trading_db}
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
@@ -56,14 +58,7 @@ services:
     ports:
       - "3000:80"
     environment:
-      # Vite environment variable for backend URL
-      # For Docker internal networking, use service name
-      # For browser access, use localhost (browser makes requests)
       - VITE_BACKEND_URL=http://localhost:8000
-    depends_on:
-      - backend
-    networks:
-      - trading-network
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health" ]
@@ -71,7 +66,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
-
-networks:
-  trading-network:
-    driver: bridge

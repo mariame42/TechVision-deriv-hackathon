@@ -33,3 +33,8 @@ pytest-asyncio>=0.21.0
 mypy>=1.5.0
 types-requests>=2.31.0
 
+# Data processing (for PostgreSQL pipeline)
+pandas>=2.0.0
+numpy>=1.24.0
+psycopg2-binary>=2.9.0
+

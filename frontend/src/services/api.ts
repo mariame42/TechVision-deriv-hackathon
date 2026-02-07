@@ -17,6 +17,7 @@ export interface DashboardData {
 export interface ChatResponse {
   success: boolean;
   data: {
+    value?: number;  // The calculated number from insights
     headline?: string;
     analysis?: string;
     action_item?: string;

@@ -23,7 +23,7 @@ def node_classifier(state: AgentState) -> AgentState:
         state: The current agent state
         
     Returns:
-        Updated state with mapped_insight_id, insight_name, and required_metrics
+        Updated state with mapped_insight_id and insight_name
     """
     query = state.get("user_query", "")
     print(f"--- CLASSIFIER: Processing '{query}' ---")
@@ -33,7 +33,6 @@ def node_classifier(state: AgentState) -> AgentState:
         return {
             "mapped_insight_id": 1,
             "insight_name": "General Analysis",
-            "required_metrics": [],
         }
     
     settings = get_settings()
@@ -67,33 +66,20 @@ def node_classifier(state: AgentState) -> AgentState:
     
     # Handle the insight info structure (it might have nested structure)
     if isinstance(insight_info, dict) and insight_info:
-        # Get the first key as name if structure is nested like {1: {"Trading revenue change": {...}}}
+        # Get the first key as name if structure is nested like {1: {"Trading revenue change": {}}}
         first_key = list(insight_info.keys())[0]
-        if isinstance(insight_info[first_key], dict) and "required_metrics" in insight_info[first_key]:
-            # Nested structure: {1: {"Trading revenue change": {"required_metrics": [...]}}}
-            name = first_key
-            required_metrics = insight_info[first_key].get("required_metrics", [])
-        elif "required_metrics" in insight_info:
-            # Flat structure: {1: {"name": "...", "required_metrics": [...]}}
-            name = insight_info.get("name", first_key)
-            required_metrics = insight_info.get("required_metrics", [])
-        else:
-            name = first_key
-            required_metrics = []
+        name = first_key
     else:
         name = "General Analysis"
-        required_metrics = []
     
     result_state = {
         "mapped_insight_id": insight_id,
         "insight_name": name,
-        "required_metrics": required_metrics,
     }
     
     print(f"   [Classifier] Returning state update:")
     print(f"   [Classifier]   - mapped_insight_id: {insight_id}")
     print(f"   [Classifier]   - insight_name: {name}")
-    print(f"   [Classifier]   - required_metrics: {required_metrics}")
     
     return result_state
 

@@ -27,6 +27,13 @@ class Settings:
     coingecko_api_key: Optional[str] = None
     bloomberg_api_key: Optional[str] = None
     
+    # PostgreSQL settings
+    postgres_host: str = "localhost"
+    postgres_database: str = "trading_db"
+    postgres_user: str = "postgres"
+    postgres_password: Optional[str] = None
+    postgres_port: str = "5432"
+    
     # LLM settings
     llm_model: str = "openai/gpt-3.5-turbo"  # Default for OpenRouter (use format: provider/model)
     llm_provider: str = "openrouter"  # or "vertex-ai", "openai", etc.
@@ -50,6 +57,11 @@ class Settings:
             bigquery_credentials_path=os.getenv("BIGQUERY_CREDENTIALS_PATH"),
             coingecko_api_key=os.getenv("COINGECKO_API_KEY"),
             bloomberg_api_key=os.getenv("BLOOMBERG_API_KEY"),
+            postgres_host=os.getenv("POSTGRES_HOST", "localhost"),
+            postgres_database=os.getenv("POSTGRES_DATABASE", "trading_db"),
+            postgres_user=os.getenv("POSTGRES_USER", "postgres"),
+            postgres_password=os.getenv("POSTGRES_PASSWORD"),
+            postgres_port=os.getenv("POSTGRES_PORT", "5432"),
             llm_model=os.getenv("LLM_MODEL", "openai/gpt-3.5-turbo"),
             llm_provider=os.getenv("LLM_PROVIDER", "openrouter"),
             llm_api_key=os.getenv("LLM_API_KEY"),
