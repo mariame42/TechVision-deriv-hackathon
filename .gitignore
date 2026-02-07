@@ -67,3 +67,5 @@ bin/
 
 # Documentation archive (troubleshooting/debug docs)
 docs/archive/
+csv/
+bin/

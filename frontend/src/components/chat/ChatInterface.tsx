@@ -37,19 +37,36 @@ const ChatInterface: React.FC = () => {
       let replyText = '';
 
       if (response.success && response.data) {
-        // Display the calculated value if available
+        // Display all fields from backend as-is
         const { value, headline, analysis, action_item } = response.data;
         
+        const parts: string[] = [];
+        
+        // Add headline if available
+        if (headline) {
+          parts.push(headline);
+        }
+        
+        // Add value if available
         if (value !== undefined && value !== null) {
-          // Display just the number for now
-          replyText = `${value}`;
-        } else if (headline) {
-          // Fallback to headline/analysis if value not available
-          replyText = headline 
-            ? `${headline}\n\n${analysis || ''}${action_item ? `\n\n💡 ${action_item}` : ''}`
-            : analysis || 'I received your query, but could not generate a response.';
+          parts.push(value.toString());
+        }
+        
+        // Add analysis if available
+        if (analysis) {
+          parts.push(analysis);
+        }
+        
+        // Add action item if available
+        if (action_item) {
+          parts.push(action_item);
+        }
+        
+        // Combine all parts
+        if (parts.length > 0) {
+          replyText = parts.join('\n\n');
         } else {
-          replyText = analysis || 'I received your query, but could not generate a response.';
+          replyText = 'I received your query, but could not generate a response.';
         }
       } else {
         replyText = response.data?.value?.toString() || response.data?.analysis || 'Sorry, I could not process your query.';

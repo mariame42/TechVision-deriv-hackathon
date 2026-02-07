@@ -55,7 +55,3 @@ def get_connection():
     except Exception as e:
         logger.error(f"DB connection error: {e}")
         raise
-
-python3 market_feed_consumer.py
-python3 finance_data_consumer.py
-python3 client_data_consumer.py

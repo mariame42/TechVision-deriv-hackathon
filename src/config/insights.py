@@ -24,16 +24,28 @@ from typing import Dict
 # Map of Insight ID to insight name
 INSIGHT_MAP: Dict[int, Dict[str, str]] = {
     1: {
-        "Trading revenue change": {}
+        "Trading revenue change": {
+            "Goes Up When": {"More trades (higher activity)", "Higher fees/commissions", "Good market opportunities", "More active clients", "Strong trading strategies"},
+            "Goes Down When": {"Low market activity", "Clients stop trading", "Lower fees (discounts/competition)", "Poor performance", "Market crashes or freezes"},
+            "zero because": "No data related provided for this insight",
+        }
     },
     2: {
         "Revenue per segment": {}
     },
     3: {
-        "Revenue sensitivity to volatility": {}
+        "Revenue sensitivity to volatility": {
+            "Goes Up When": {"Company focuses on short-term trading", "Many day traders", "High use of derivatives/options", "Algorithmic/high-frequency trading", "Markets are unstable"},
+            "Goes Down When": {"More long-term investors", "Stable markets", "Fixed-fee products", "Passive strategies"},
+            "zero because": "No data related provided for this insight",
+        }
     },
     4: {
-        "Active trader change": {}
+        "Active trader change": {
+            "Goes Up When": {"New users join", "Good promotions", "Easy-to-use platform", "High market excitement", "Profitable users"},
+            "Goes Down When": {"Users lose money", "Bad user experience", "High fees", "Strong competitors", "Trust/security problems"},
+            "zero because": "No data related provided for this insight",
+        }
     },
     5: {
         "VIP migration": {}
@@ -45,10 +57,16 @@ INSIGHT_MAP: Dict[int, Dict[str, str]] = {
         "Volatility regime shift": {}
     },
     8: {
-        "Volume contraction": {}
+        "Volume contraction": {
+            "Goes Up When": {"Investors are uncertain", "Waiting for news", "Low volatility", "Market holidays", "Loss of confidence", "Fewer active traders"},
+            "Goes Down When": {"Big news/events", "High volatility", "New products", "Strong trends", "Panic buying/selling"},
+            "zero because": "No data related provided for this insight",
+        }
     },
     9: {
-        "Asset rotation detection": {}
+        "Asset rotation detection": {
+            "zero because": "No data is provided related to the bitcoin market",
+        }
     },
     10: {
         "Exposure concentration": {}
@@ -78,6 +96,7 @@ INSIGHT_MAP: Dict[int, Dict[str, str]] = {
         "Risk surge root cause chain": {}
     },
 }
+
 
 # Revenue
 
